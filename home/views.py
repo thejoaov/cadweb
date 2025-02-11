@@ -5,19 +5,21 @@ from .forms import *
 from django.http import JsonResponse
 from django.apps import apps
 # from datetime import date 
+from django.contrib.auth.decorators import login_required
 import datetime
 
+@login_required
 def index(request):
     return render(request,'index.html')
 
-# @login_required
+@login_required
 def categoria(request): 
     contexto = {
         'lista': Categoria.objects.all().order_by('-id'),
     }
     return render(request, 'categoria/lista.html', contexto)
 
-# @login_required
+@login_required
 def form_categoria(request):
     if (request.method == 'POST'):
         form = CategoriaForm(request.POST)
@@ -33,7 +35,7 @@ def form_categoria(request):
     
     return render(request, 'categoria/formulario.html', {'form': form,})
 
-
+@login_required
 def editar_categoria(request, id):
     try:
         categoria = Categoria.objects.get(pk=id)
@@ -54,7 +56,7 @@ def editar_categoria(request, id):
     
     return render(request, 'categoria/formulario.html', {'form':form,})
 
-
+@login_required
 def remover_categoria(request, id):
     try:
         categoria = Categoria.objects.get(pk=id)
@@ -67,6 +69,7 @@ def remover_categoria(request, id):
     return redirect('lista')
     # return render(request, 'categoria/lista.html')
 
+@login_required
 def detalhe_categoria(request, id):
     try:
         categoria = get_object_or_404(Categoria, pk=id)
@@ -78,12 +81,14 @@ def detalhe_categoria(request, id):
 
 
 # Clientes Formulário
+@login_required
 def cliente(request):
     contexto={
         'listaCliente': Cliente.objects.all().order_by('-id')
     }
     return render(request,'cliente/lista.html', contexto)
 
+@login_required
 def form_cliente(request):
     if (request.method == 'POST'):
         form = ClienteForm(request.POST)
@@ -99,7 +104,7 @@ def form_cliente(request):
     
     return render(request, 'cliente/formulario.html', {'form': form,})
 
-
+@login_required
 def editar_cliente(request, id):
     try:
         cliente = Cliente.objects.get(pk=id)
@@ -120,7 +125,7 @@ def editar_cliente(request, id):
     
     return render(request, 'cliente/formulario.html', {'form':form,})
 
-
+@login_required
 def remover_cliente(request, id):
     try:
         cliente = Cliente.objects.get(pk=id)
@@ -132,6 +137,7 @@ def remover_cliente(request, id):
     
     return redirect('listaCliente')
 
+@login_required
 def detalhe_cliente(request, id):
     try:
         cliente = get_object_or_404(Cliente, pk=id)
@@ -143,6 +149,7 @@ def detalhe_cliente(request, id):
 
 
 # Produto Formulário
+@login_required
 def produto(request):
     contexto={
         'listaProduto': Produto.objects.all().order_by('-id')
@@ -164,7 +171,7 @@ def form_produto(request):
     
     return render(request, 'produto/formulario.html', {'form': form,})
 
-
+@login_required
 def editar_produto(request, id):
     try:
         produto = Produto.objects.get(pk=id)
@@ -186,6 +193,7 @@ def editar_produto(request, id):
     
     return render(request, 'produto/formulario.html', {'form':form,})
 
+@login_required
 def remover_produto(request, id):
     try:
         produto = Produto.objects.get(pk=id)
@@ -197,6 +205,7 @@ def remover_produto(request, id):
     
     return redirect('listaProduto')
 
+@login_required
 def detalhe_produto(request, id):
     try:
         produto = get_object_or_404(Produto, pk=id)
@@ -207,7 +216,7 @@ def detalhe_produto(request, id):
     return render(request, 'produto/detalhes.html', {'produto':produto,})
 
 #Ajustar estoque: 
-
+@login_required
 def ajustar_estoque(request, id):
     produto = Produto.objects.get(pk=id)
     estoque = produto.estoque 
@@ -225,12 +234,15 @@ def ajustar_estoque(request, id):
 
 
 # Teste 
+@login_required
 def teste1(request):
     return render(request, 'testes/teste1.html')
 
+@login_required
 def teste2(request):
     return render(request, 'testes/teste2.html')
 
+@login_required
 def buscar_dados(request, app_modelo):
     termo = request.GET.get('q', '') # pega o termo digitado
     try:
@@ -248,15 +260,16 @@ def buscar_dados(request, app_modelo):
     dados = [{'id': obj.id, 'nome': obj.nome} for obj in resultados]
     return JsonResponse(dados, safe=False)
 
+@login_required
 def teste3(request):
     return render(request, 'testes/teste3.html')
 
-
+@login_required
 def pedido(request):
     listaPedido = Pedido.objects.all().order_by('-id')
     return render(request, 'pedido/lista.html', {'listaPedido': listaPedido})
 
-
+@login_required
 def novo_pedido(request,id):
     if request.method == 'GET':
         try:
@@ -278,7 +291,7 @@ def novo_pedido(request,id):
 
     return render(request, 'pedido/formulario.html', {'form': form})
 
-
+@login_required
 def detalhes_pedido(request, id):
     try:
         pedido = Pedido.objects.get(pk=id)
@@ -305,9 +318,9 @@ def detalhes_pedido(request, id):
                 # Decrementando a quantidade do estoque
                 estoque_atual.qtde = estoque_atual.qtde - item_pedido.qtde
                 item_pedido.produto.estoque.qtde = estoque_atual
-                item_pedido.produto.estoque.save()   # Salvando a atualização do estoque
+                estoque_atual.save()
                 item_pedido.save()  # Salvando o item do pedido
-                print (f'atualizado: {estoque_atual.qtde}')
+                print (f'atualizado: {item_pedido.produto.estoque.qtde}')
 
                 messages.success(request, 'Produto adicionado com sucesso!')
                 itemPedido = ItemPedido(pedido=pedido)
@@ -322,7 +335,7 @@ def detalhes_pedido(request, id):
     }
     return render(request, 'pedido/detalhes.html', contexto)
 
-
+@login_required
 def editar_pedido(request, id):
     try:
         pedido = Pedido.objects.get(pk=id)
@@ -344,6 +357,7 @@ def editar_pedido(request, id):
     
     return render(request, 'pedido/formulario.html', {'form':form,})
 
+@login_required
 def remover_item_pedido(request, id):
     try:
         item_pedido = ItemPedido.objects.get(pk=id)
@@ -364,6 +378,7 @@ def remover_item_pedido(request, id):
     # Redireciona de volta para a página de detalhes do pedido
     return redirect('detalhes_pedido', id=pedido_id)
 
+@login_required
 def remover_pedido(request, id):
     try:
         pedido = Pedido.objects.get(pk=id)
@@ -375,7 +390,7 @@ def remover_pedido(request, id):
     
     return redirect('listaPedido')
 
-
+@login_required
 def editar_item_pedido(request, id):
     try:
         item_pedido = ItemPedido.objects.get(pk=id)
@@ -398,7 +413,7 @@ def editar_item_pedido(request, id):
             if estoque_atual >= nova_quantidade_item:
                 estoque_atual = estoque_atual + quantidade_anterior  
                 estoque_atual = estoque_atual - nova_quantidade_item
-                
+
                 item_pedido.produto.estoque.qtde = estoque_atual
 
                 item_pedido.produto.estoque.save()
@@ -430,6 +445,7 @@ def editar_item_pedido(request, id):
     }
     return render(request, 'pedido/detalhes.html', contexto)
 
+@login_required
 def form_pagamento(request,id):
     try:
         pedido = Pedido.objects.get(pk=id)
@@ -460,7 +476,7 @@ def form_pagamento(request,id):
     }    
     return render(request, 'pedido/pagamento.html',contexto)
 
-
+@login_required
 def remover_pagamento(request, id):
     try:
         pagamento = Pagamento.objects.get(pk=id)
@@ -473,3 +489,7 @@ def remover_pagamento(request, id):
     
     return redirect('form_pagamento', id=pagamento_id)
 
+# @login_required
+# def user_logout(request):
+#     logout(request)
+#     return redirect('login')

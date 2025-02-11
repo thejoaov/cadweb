@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from dotenv import load_dotenv
 import dj_database_url
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9c167b1b81a17a1b67c19a98de1f8745d8175dd512c6f7f3e9126024f2eafd569214952f89b7790d41abf4d9804b1ff5b55bac920c69c4f794dd64c74a485457d05e5841c3bda7f6664965fad7a846b032270bea7eb8e0d48be4dd8cfd20c3045cc4bef838cebf4a7b29ba3c7f1e64fa944c4375fe9e16fe21f67b663a97c2ca'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8@&l5wz#*q5g$*z^8p7z#k@y2v4k@z@u5!l&5#8b&z6x3#x8$')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True  
@@ -79,7 +82,9 @@ WSGI_APPLICATION = 'pweb.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-  'default': dj_database_url.parse('postgresql://neondb_owner:npg_vnX6KkG0BYeP@ep-polished-sunset-a82c4tr3-pooler.eastus2.azure.neon.tech/neondb?sslmode=require') 
+  'default': dj_database_url.parse(
+    os.getenv('DATABASE_URL')
+  ) 
 }
 
 # 'default': dj_database_url.parse('')
